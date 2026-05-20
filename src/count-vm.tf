@@ -1,25 +1,20 @@
-locals {
-  public_ssh_key = file("~/.ssh/id_rsa.pub")
-}
-
-# Создание web-1 и web-2
 resource "yandex_compute_instance" "web" {
-  count = 2
+  count = var.web_vm_config.count
   
   name        = "web-${count.index + 1}"
-  platform_id = "standard-v1"
+  platform_id = var.web_vm_config.platform_id
   zone        = var.zone
 
   resources {
-    cores         = 2
-    memory        = 2
-    core_fraction = 20
+    cores         = var.web_vm_config.cpu
+    memory        = var.web_vm_config.ram
+    core_fraction = var.web_vm_config.core_fraction
   }
 
   boot_disk {
     initialize_params {
-      image_id = var.image_id
-      size     = 10
+      image_id = data.yandex_compute_image.ubuntu.id
+      size     = var.web_vm_config.disk_size
     }
   }
 
